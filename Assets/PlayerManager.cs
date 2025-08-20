@@ -3,32 +3,59 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     [Header("速度パラメータ")]
-    public float maxSpeed = 30f;       // 前進の最高速度
-    public float reverseSpeed = 10f;   // バック最高速度
+    public float maxSpeed = 30f;        // 通常の最高速度
+    public float reverseSpeed = 10f;    // バック最高速度
     public float accelerationTime = 3f; // 最高速到達にかかる時間（秒）
-    public float brakeForce = 30f;     // ブレーキ減速力
-    public float turnSpeed = 100f;     // ハンドル回転速度
+    public float brakeForce = 30f;      // ブレーキ減速力
+    public float turnSpeed = 100f;      // ハンドル回転速度
 
     [Header("ドリフト設定")]
     public float driftFactor = 0.95f;
     public float normalFactor = 0.85f;
 
+    [Header("ブースト設定")]
+    public float driftTriggerTime = 2f;
+    public float boostDuration = 3f;
+    public float boostSpeedBonus = 15f;
+
     private Rigidbody rb;
     private bool isDrifting = false;
-    private float currentSpeed = 0f; // 前進時の現在速度
+    private float currentSpeed = 0f;
+    private float driftTimer = 0f;
+    private bool isBoosting = false;
+    private float boostTimer = 0f;
+    private float currentMaxSpeed;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        currentMaxSpeed = maxSpeed;
     }
 
     void Update()
     {
-        // 左クリックでドリフトON/OFF
-        if (Input.GetMouseButtonDown(0))
-            isDrifting = true;
-        if (Input.GetMouseButtonUp(0))
-            isDrifting = false;
+        // 左クリックを押している間だけドリフト
+        isDrifting = Input.GetMouseButton(0);
+
+        // ドリフト時間を計測してブースト判定
+        if (isDrifting)
+        {
+            driftTimer += Time.deltaTime;
+            if (driftTimer >= driftTriggerTime && !isBoosting)
+                ActivateBoost();
+        }
+        else
+        {
+            driftTimer = 0f;
+        }
+
+        // ブースト管理
+        if (isBoosting)
+        {
+            boostTimer -= Time.deltaTime;
+            if (boostTimer <= 0f)
+                EndBoost();
+        }
     }
 
     void FixedUpdate()
@@ -37,25 +64,33 @@ public class PlayerManager : MonoBehaviour
         bool accelKey = Input.GetKey(KeyCode.UpArrow);
         bool brakeKey = Input.GetKey(KeyCode.DownArrow);
 
+        // 現在バック中か判定
+        bool isReversing = currentSpeed < -0.1f;
+
         // 前進（徐々に加速）
         if (accelKey)
         {
-            float accelRate = maxSpeed / accelerationTime; // 1秒あたりの速度増加量
-            currentSpeed = Mathf.MoveTowards(currentSpeed, maxSpeed, accelRate * Time.fixedDeltaTime);
+            float accelRate = currentMaxSpeed / accelerationTime;
+            currentSpeed = Mathf.MoveTowards(currentSpeed, currentMaxSpeed, accelRate * Time.fixedDeltaTime);
         }
-        // ブレーキ or バック
+        // ↓キーでの処理
         else if (brakeKey)
         {
-            if (rb.linearVelocity.magnitude > 0.1f)
+            if (!isReversing) // バック中はブレーキを無効化
             {
-                rb.AddForce(-transform.forward * brakeForce, ForceMode.Acceleration);
-                currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, brakeForce * Time.fixedDeltaTime);
+                if (Mathf.Abs(currentSpeed) > 0.1f)
+                {
+                    // 減速（前進からのブレーキ）
+                    currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, brakeForce * Time.fixedDeltaTime);
+                }
+                else
+                {
+                    // 停止中 → バック開始
+                    float reverseRate = reverseSpeed / accelerationTime;
+                    currentSpeed = Mathf.MoveTowards(currentSpeed, -reverseSpeed, reverseRate * Time.fixedDeltaTime);
+                }
             }
-            else
-            {
-                float reverseRate = reverseSpeed / accelerationTime;
-                currentSpeed = Mathf.MoveTowards(currentSpeed, -reverseSpeed, reverseRate * Time.fixedDeltaTime);
-            }
+            // バック中の場合は何もしない（スロットルを緩めて自然減速のみ）
         }
         else
         {
@@ -73,7 +108,7 @@ public class PlayerManager : MonoBehaviour
             rb.MoveRotation(rb.rotation * Quaternion.Euler(0f, turnAmount, 0f));
         }
 
-        // ドリフト
+        // ドリフト処理
         ApplyDrift();
     }
 
@@ -81,7 +116,20 @@ public class PlayerManager : MonoBehaviour
     {
         Vector3 localVelocity = transform.InverseTransformDirection(rb.linearVelocity);
         float factor = isDrifting ? driftFactor : normalFactor;
-        localVelocity.x *= factor; // 横滑り減衰
+        localVelocity.x *= factor;
         rb.linearVelocity = transform.TransformDirection(localVelocity);
+    }
+
+    void ActivateBoost()
+    {
+        isBoosting = true;
+        boostTimer = boostDuration;
+        currentMaxSpeed = maxSpeed + boostSpeedBonus;
+    }
+
+    void EndBoost()
+    {
+        isBoosting = false;
+        currentMaxSpeed = maxSpeed;
     }
 }
