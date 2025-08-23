@@ -1,34 +1,61 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    [Header("‘¬“xƒpƒ‰ƒ[ƒ^")]
-    public float maxSpeed = 30f;       // ‘Oi‚ÌÅ‚‘¬“x
-    public float reverseSpeed = 10f;   // ƒoƒbƒNÅ‚‘¬“x
-    public float accelerationTime = 3f; // Å‚‘¬“’B‚É‚©‚©‚éŠÔi•bj
-    public float brakeForce = 30f;     // ƒuƒŒ[ƒLŒ¸‘¬—Í
-    public float turnSpeed = 100f;     // ƒnƒ“ƒhƒ‹‰ñ“]‘¬“x
+    [Header("é€Ÿåº¦ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿")]
+    public float maxSpeed = 30f;        // é€šå¸¸ã®æœ€é«˜é€Ÿåº¦
+    public float reverseSpeed = 10f;    // ãƒãƒƒã‚¯æœ€é«˜é€Ÿåº¦
+    public float accelerationTime = 3f; // æœ€é«˜é€Ÿåˆ°é”ã«ã‹ã‹ã‚‹æ™‚é–“ï¼ˆç§’ï¼‰
+    public float brakeForce = 30f;      // ãƒ–ãƒ¬ãƒ¼ã‚­æ¸›é€ŸåŠ›
+    public float turnSpeed = 100f;      // ãƒãƒ³ãƒ‰ãƒ«å›è»¢é€Ÿåº¦
 
-    [Header("ƒhƒŠƒtƒgİ’è")]
+    [Header("ãƒ‰ãƒªãƒ•ãƒˆè¨­å®š")]
     public float driftFactor = 0.95f;
     public float normalFactor = 0.85f;
 
+    [Header("ãƒ–ãƒ¼ã‚¹ãƒˆè¨­å®š")]
+    public float driftTriggerTime = 2f;
+    public float boostDuration = 3f;
+    public float boostSpeedBonus = 15f;
+
     private Rigidbody rb;
     private bool isDrifting = false;
-    private float currentSpeed = 0f; // ‘Oi‚ÌŒ»İ‘¬“x
+    private float currentSpeed = 0f;
+    private float driftTimer = 0f;
+    private bool isBoosting = false;
+    private float boostTimer = 0f;
+    private float currentMaxSpeed;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        currentMaxSpeed = maxSpeed;
     }
 
     void Update()
     {
-        // ¶ƒNƒŠƒbƒN‚ÅƒhƒŠƒtƒgON/OFF
-        if (Input.GetMouseButtonDown(0))
-            isDrifting = true;
-        if (Input.GetMouseButtonUp(0))
-            isDrifting = false;
+        // å·¦ã‚¯ãƒªãƒƒã‚¯ã‚’æŠ¼ã—ã¦ã„ã‚‹é–“ã ã‘ãƒ‰ãƒªãƒ•ãƒˆ
+        isDrifting = Input.GetMouseButton(0);
+
+        // ãƒ‰ãƒªãƒ•ãƒˆæ™‚é–“ã‚’è¨ˆæ¸¬ã—ã¦ãƒ–ãƒ¼ã‚¹ãƒˆåˆ¤å®š
+        if (isDrifting)
+        {
+            driftTimer += Time.deltaTime;
+            if (driftTimer >= driftTriggerTime && !isBoosting)
+                ActivateBoost();
+        }
+        else
+        {
+            driftTimer = 0f;
+        }
+
+        // ãƒ–ãƒ¼ã‚¹ãƒˆç®¡ç†
+        if (isBoosting)
+        {
+            boostTimer -= Time.deltaTime;
+            if (boostTimer <= 0f)
+                EndBoost();
+        }
     }
 
     void FixedUpdate()
@@ -37,43 +64,51 @@ public class PlayerManager : MonoBehaviour
         bool accelKey = Input.GetKey(KeyCode.UpArrow);
         bool brakeKey = Input.GetKey(KeyCode.DownArrow);
 
-        // ‘Oii™X‚É‰Á‘¬j
+        // ç¾åœ¨ãƒãƒƒã‚¯ä¸­ã‹åˆ¤å®š
+        bool isReversing = currentSpeed < -0.1f;
+
+        // å‰é€²ï¼ˆå¾ã€…ã«åŠ é€Ÿï¼‰
         if (accelKey)
         {
-            float accelRate = maxSpeed / accelerationTime; // 1•b‚ ‚½‚è‚Ì‘¬“x‘‰Á—Ê
-            currentSpeed = Mathf.MoveTowards(currentSpeed, maxSpeed, accelRate * Time.fixedDeltaTime);
+            float accelRate = currentMaxSpeed / accelerationTime;
+            currentSpeed = Mathf.MoveTowards(currentSpeed, currentMaxSpeed, accelRate * Time.fixedDeltaTime);
         }
-        // ƒuƒŒ[ƒL or ƒoƒbƒN
+        // â†“ã‚­ãƒ¼ã§ã®å‡¦ç†
         else if (brakeKey)
         {
-            if (rb.linearVelocity.magnitude > 0.1f)
+            if (!isReversing) // ãƒãƒƒã‚¯ä¸­ã¯ãƒ–ãƒ¬ãƒ¼ã‚­ã‚’ç„¡åŠ¹åŒ–
             {
-                rb.AddForce(-transform.forward * brakeForce, ForceMode.Acceleration);
-                currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, brakeForce * Time.fixedDeltaTime);
+                if (Mathf.Abs(currentSpeed) > 0.1f)
+                {
+                    // æ¸›é€Ÿï¼ˆå‰é€²ã‹ã‚‰ã®ãƒ–ãƒ¬ãƒ¼ã‚­ï¼‰
+                    currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, brakeForce * Time.fixedDeltaTime);
+                }
+                else
+                {
+                    // åœæ­¢ä¸­ â†’ ãƒãƒƒã‚¯é–‹å§‹
+                    float reverseRate = reverseSpeed / accelerationTime;
+                    currentSpeed = Mathf.MoveTowards(currentSpeed, -reverseSpeed, reverseRate * Time.fixedDeltaTime);
+                }
             }
-            else
-            {
-                float reverseRate = reverseSpeed / accelerationTime;
-                currentSpeed = Mathf.MoveTowards(currentSpeed, -reverseSpeed, reverseRate * Time.fixedDeltaTime);
-            }
+            // ãƒãƒƒã‚¯ä¸­ã®å ´åˆã¯ä½•ã‚‚ã—ãªã„ï¼ˆã‚¹ãƒ­ãƒƒãƒˆãƒ«ã‚’ç·©ã‚ã¦è‡ªç„¶æ¸›é€Ÿã®ã¿ï¼‰
         }
         else
         {
-            // ƒAƒNƒZƒ‹‚àƒuƒŒ[ƒL‚à‰Ÿ‚µ‚Ä‚¢‚È‚¢ê‡‚Í©‘RŒ¸‘¬
+            // ã‚¢ã‚¯ã‚»ãƒ«ã‚‚ãƒ–ãƒ¬ãƒ¼ã‚­ã‚‚æŠ¼ã—ã¦ã„ãªã„å ´åˆã¯è‡ªç„¶æ¸›é€Ÿ
             currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, brakeForce * 0.5f * Time.fixedDeltaTime);
         }
 
-        // Œ»İ‚Ì‘¬“x‚ÅˆÚ“®
+        // ç¾åœ¨ã®é€Ÿåº¦ã§ç§»å‹•
         rb.linearVelocity = transform.forward * currentSpeed;
 
-        // ‰ñ“]
+        // å›è»¢
         if (rb.linearVelocity.magnitude > 0.5f)
         {
             float turnAmount = horizontal * turnSpeed * Time.fixedDeltaTime;
             rb.MoveRotation(rb.rotation * Quaternion.Euler(0f, turnAmount, 0f));
         }
 
-        // ƒhƒŠƒtƒg
+        // ãƒ‰ãƒªãƒ•ãƒˆå‡¦ç†
         ApplyDrift();
     }
 
@@ -81,7 +116,20 @@ public class PlayerManager : MonoBehaviour
     {
         Vector3 localVelocity = transform.InverseTransformDirection(rb.linearVelocity);
         float factor = isDrifting ? driftFactor : normalFactor;
-        localVelocity.x *= factor; // ‰¡ŠŠ‚èŒ¸Š
+        localVelocity.x *= factor;
         rb.linearVelocity = transform.TransformDirection(localVelocity);
+    }
+
+    void ActivateBoost()
+    {
+        isBoosting = true;
+        boostTimer = boostDuration;
+        currentMaxSpeed = maxSpeed + boostSpeedBonus;
+    }
+
+    void EndBoost()
+    {
+        isBoosting = false;
+        currentMaxSpeed = maxSpeed;
     }
 }
