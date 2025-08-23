@@ -692,12 +692,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 30
-  reverseSpeed: 10
+  reverseSpeed: 2000
   accelerationTime: 3
   brakeForce: 30
   turnSpeed: 100
-  driftFactor: 0.95
-  normalFactor: 0.85
+  driftFactor: 5
+  normalFactor: 5
+  driftTriggerTime: 2
+  boostDuration: 3
+  boostSpeedBonus: 15
 --- !u!4 &289807469 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 544196564545435927, guid: 21c7e49b14231c348ab698b9022b8cb7, type: 3}
