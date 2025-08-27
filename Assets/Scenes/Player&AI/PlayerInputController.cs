@@ -14,8 +14,8 @@ public class PlayerInputController : VehicleController
 
         // キーボード＆マウスから入力を取得
         float horizontal = Input.GetAxis("Horizontal");           // ←→キーまたはA/Dキー
-        bool accel = Input.GetKey(KeyCode.UpArrow);               // ↑キー
-        bool brake = Input.GetKey(KeyCode.DownArrow);             // ↓キー
+        bool accel = Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W);    // ↑キーまたはWキー
+        bool brake = Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S);// ↓キーまたはDキー
         bool drift = Input.GetMouseButton(0);                     // 左クリック（ドリフト）
 
         // 入力を VehicleController に渡す
