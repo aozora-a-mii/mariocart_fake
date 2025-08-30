@@ -4,28 +4,6 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
-    path: Assets/Scenes/Title.unity
-    guid: 69d50883371228544af72c6d49aea9d4
-  - enabled: 1
-    path: Assets/Scenes/Car.unity
-    guid: bf2f80676c28e4e4e9c7469162b38074
-  - enabled: 1
-    path: Assets/Scenes/StageSelectScene.unity
-    guid: d4b17d77d55195244a220467f2f50749
-  - enabled: 0
-    path: Assets/Scenes/Test.unity
-    guid: 6213c8e3ba321434c85bb5c26153df50
-  - enabled: 1
-    path: Assets/Scenes/WIN.unity
-    guid: 73fa5a3cb5ae4344d8152c37060d6f69
-  - enabled: 1
-    path: Assets/Scenes/LOSE.unity
-    guid: 727df8cd8e331424ca61bede0d00578a
-  m_configObjects:
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_Scenes: []
+  m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
