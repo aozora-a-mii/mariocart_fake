@@ -60,5 +60,6 @@ public class NPCController : VehicleController
 
         // 加速しながら旋回・ドリフト
         SetInput(steer, true, false, shouldDrift);
+        
     }
 }
