@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// NPCが通過するエリアの順序を管理し、ゴール回数をカウントするクラス。
@@ -36,6 +37,8 @@ public class NPCGoalManager : MonoBehaviour
             if (goalPassCount >= goalPassesRequired)
             {
                 Debug.Log($"{name} がゴールに {goalPassesRequired} 回到達しました！");
+                // シーンの読み込み
+                SceneManager.LoadScene("LOSE");
             }
         }
 
