@@ -520,8 +520,8 @@ MonoBehaviour:
   selectedColor: {r: 0.9748427, g: 0.2944547, b: 0.21765348, a: 1}
   normalColor: {r: 0, g: 0, b: 0, a: 1}
   raceSceneNames:
-  - Stage2
   - Stage1
+  - Stage2
 --- !u!1 &674580600
 GameObject:
   m_ObjectHideFlags: 0
