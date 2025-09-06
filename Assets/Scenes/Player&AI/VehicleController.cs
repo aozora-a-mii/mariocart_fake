@@ -129,7 +129,11 @@ public class VehicleController : MonoBehaviour
             // 入力が無ければ自然減速
             currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, brakeForce * 0.5f * Time.fixedDeltaTime);
         }
-        rb.linearVelocity = transform.forward * currentSpeed;
+
+        // ★ 修正版: 重力方向(y)を保持して前後方向の速度を更新
+        Vector3 velocity = transform.forward * currentSpeed;
+        velocity.y = rb.linearVelocity.y;
+        rb.linearVelocity = velocity;
 
         // 一定以上のスピードがあるときだけ回転
         if (rb.linearVelocity.magnitude > 0.5f)

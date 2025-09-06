@@ -21,7 +21,7 @@ public class NPCController : VehicleController
         base.Start();
 
         // ゴールマネージャーを取得
-        goalManager = GetComponent<NPCGoalManager>();
+        goalManager = GameObject.FindAnyObjectByType<NPCGoalManager>();
         currentTarget = goalManager.GetNextTarget();
     }
 
