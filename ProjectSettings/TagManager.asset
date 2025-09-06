@@ -6,6 +6,8 @@ TagManager:
   tags:
   - SS
   - itembox
+  - Checkpoint
+  - Goal
   layers:
   - Default
   - TransparentFX

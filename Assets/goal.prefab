@@ -12,10 +12,9 @@ GameObject:
   - component: {fileID: 3912328390992182110}
   - component: {fileID: 2090388711748145447}
   - component: {fileID: 5986897954481693583}
-  - component: {fileID: 3640219887402427117}
   m_Layer: 0
   m_Name: goal
-  m_TagString: Untagged
+  m_TagString: Goal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,19 +109,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3640219887402427117
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 326547917339926385}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d073902152afe4a4aa9206a126c9fd3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetCount: 3
 --- !u!1 &1358854481491488700
 GameObject:
   m_ObjectHideFlags: 0
@@ -135,10 +121,9 @@ GameObject:
   - component: {fileID: 4784534774873149560}
   - component: {fileID: 7066727967980280379}
   - component: {fileID: 4428358846248613294}
-  - component: {fileID: 8216304320922171590}
   m_Layer: 0
   m_Name: goal2
-  m_TagString: Untagged
+  m_TagString: Checkpoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -232,16 +217,3 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8216304320922171590
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1358854481491488700}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44ffccbe68ec63942a7f5311b6499114, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerTag: Player
