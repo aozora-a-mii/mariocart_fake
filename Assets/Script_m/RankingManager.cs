@@ -147,7 +147,7 @@ public class RankingManager : MonoBehaviour
         }
         else
         {
-           
+            Debug.LogWarning($"RankingManager: 未知のコントローラー ({controller.name}) が進行状況を更新しようとしました。", controller);
         }
     }
 
@@ -165,7 +165,7 @@ public class RankingManager : MonoBehaviour
 
     /// <summary>
     /// 現在の参加者リストに基づいてプレイヤーのランキングUIを更新します。
-    /// 表示形式を「X位 (ゴール!)」のように変更します。
+    /// 表示形式を「X位 [現在のラップ数/目標ラップ数] (ゴール!)」のように変更します。
     /// </summary>
     void UpdateRankingUI()
     {
@@ -183,8 +183,11 @@ public class RankingManager : MonoBehaviour
             // プレイヤーの順位を計算 (リストのインデックスは0から始まるため+1する)
             int playerRank = participants.IndexOf(playerParticipant) + 1;
 
-            // プレイヤーの順位だけを表示する形式に更新
-            playerRankingUIText.text = $"{playerRank}位";
+            // ゴール済みの場合、 "(ゴール!)" を追加
+            string status = playerParticipant.IsFinished ? " (ゴール!)" : "";
+
+            // プレイヤーの順位とラップ数を表示する形式に更新
+            playerRankingUIText.text = $"{playerRank}位 [{playerParticipant.CurrentProgress}/{playerParticipant.TargetProgress}]{status}";
             playerRankingUIText.gameObject.SetActive(true);
         }
         else
